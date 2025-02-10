@@ -1,3 +1,6 @@
+import json
+
+
 def read_cook_book(file_path):
     cook_book = {}
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -19,9 +22,6 @@ def read_cook_book(file_path):
             file.readline()  # Пропускаем пустую строку между рецептами
     return cook_book
 
-# Пример использования
-cook_book = read_cook_book('recipes.txt')
-print(cook_book)
 
 def get_shop_list_by_dishes(dishes, person_count, cook_book):
     shop_list = {}
@@ -36,10 +36,22 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
                 else:
                     shop_list[ingredient_name] = {'measure': measure, 'quantity': quantity}
     return shop_list
+def save_book(book, file_path):
 
-# Пример использования
-shop_list = get_shop_list_by_dishes(['Запеченный картофель', 'Омлет'], 2, cook_book)
-print(shop_list)
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump(book, file, ensure_ascii=False, indent=4)
+
+def load_book(file_path):
+
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+
+def print_book(book):
+
+    print(json.dumps(cook_book, ensure_ascii=False, indent=4))
+
+
 
 def merge_files(file_names, output_file):
     files_info = []
@@ -58,5 +70,16 @@ def merge_files(file_names, output_file):
             output.writelines(file_info['content'])
 
 # Пример использования
-file_names = ['1.txt', '2.txt']
-merge_files(file_names, 'merged_file.txt')
+if __name__ == "__main__":
+    cook_book = read_cook_book('recipes.txt')
+    save_book(cook_book, 'cook_book.json')  # Сохраняем в JSON
+    cook_book = load_book('cook_book.json')  # Загружаем из JSON
+    print_book(cook_book)  # Красивый вывод
+
+    shop_list = get_shop_list_by_dishes(['Запеченный картофель', 'Омлет'], 2, cook_book)
+    save_book(shop_list, 'cook_book.json')  # Сохраняем в JSON
+    cook_book = load_book('cook_book.json')  # Загружаем из JSON
+    print_book(shop_list)
+
+    file_names = ['1.txt', '2.txt']
+    merge_files(file_names, 'merged_file.txt')
