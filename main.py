@@ -1,3 +1,4 @@
+
 def read_cook_book(file_path):
     cook_book = {}
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -32,7 +33,7 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
                 measure = ingredient['measure']
                 quantity = ingredient['quantity'] * person_count
                 if ingredient_name in shop_list:
-                    shop_list[ingredient_name]['quantity'] += quantity
+                    shop_list[ingredient_name]['quantity']+= quantity
                 else:
                     shop_list[ingredient_name] = {'measure': measure, 'quantity': quantity}
     return shop_list
