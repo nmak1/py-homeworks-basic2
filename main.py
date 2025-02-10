@@ -40,3 +40,4 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
 # Пример использования
 shop_list = get_shop_list_by_dishes(['Запеченный картофель', 'Омлет'], 2, cook_book)
 print(shop_list)
+
