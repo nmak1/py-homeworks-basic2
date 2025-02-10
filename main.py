@@ -22,3 +22,21 @@ def read_cook_book(file_path):
 # Пример использования
 cook_book = read_cook_book('recipes.txt')
 print(cook_book)
+
+def get_shop_list_by_dishes(dishes, person_count, cook_book):
+    shop_list = {}
+    for dish in dishes:
+        if dish in cook_book:
+            for ingredient in cook_book[dish]:
+                ingredient_name = ingredient['ingredient_name']
+                measure = ingredient['measure']
+                quantity = ingredient['quantity'] * person_count
+                if ingredient_name in shop_list:
+                    shop_list[ingredient_name]['quantity'] += quantity
+                else:
+                    shop_list[ingredient_name] = {'measure': measure, 'quantity': quantity}
+    return shop_list
+
+# Пример использования
+shop_list = get_shop_list_by_dishes(['Запеченный картофель', 'Омлет'], 2, cook_book)
+print(shop_list)
