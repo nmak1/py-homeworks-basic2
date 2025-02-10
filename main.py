@@ -41,3 +41,22 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
 shop_list = get_shop_list_by_dishes(['Запеченный картофель', 'Омлет'], 2, cook_book)
 print(shop_list)
 
+def merge_files(file_names, output_file):
+    files_info = []
+    for file_name in file_names:
+        with open(file_name, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+            files_info.append({
+                'name': file_name,
+                'line_count': len(lines),
+                'content': lines
+            })
+    files_info.sort(key=lambda x: x['line_count'])
+    with open(output_file, 'w', encoding='utf-8') as output:
+        for file_info in files_info:
+            output.write(f"{file_info['name']}\n{file_info['line_count']}\n")
+            output.writelines(file_info['content'])
+
+# Пример использования
+file_names = ['1.txt', '2.txt']
+merge_files(file_names, 'merged_file.txt')
