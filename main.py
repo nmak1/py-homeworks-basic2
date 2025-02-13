@@ -1,37 +1,42 @@
 import json
-from typing import Any
-
+from typing import Dict, List, Any
 
 class CookBook:
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path = path
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.path
 
-    def read_cook_book(file_path) :
+    @staticmethod
+    def read_cook_book(file_path: str) -> Dict[str, List[Dict[str, Any]]]:
         cook_book = {}
-        with open(str(file_path), 'r', encoding='utf-8') as file:
-            while True:
-                dish_name = file.readline().strip()
-                if not dish_name:
-                    break
-                ingredient_count = int(file.readline().strip())
-                ingredients = []
-                for _ in range(ingredient_count):
-                    ingredient_info = file.readline().strip().split(' | ')
-                    ingredient = {
-                        'ingredient_name': ingredient_info[0],
-                        'quantity': int(ingredient_info[1]),
-                        'measure': ingredient_info[2]
-                    }
-                    ingredients.append(ingredient)
-                cook_book[dish_name] = ingredients
-                file.readline()  # Пропускаем пустую строку между рецептами
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                while True:
+                    dish_name = file.readline().strip()
+                    if not dish_name:
+                        break
+                    ingredient_count = int(file.readline().strip())
+                    ingredients = []
+                    for _ in range(ingredient_count):
+                        ingredient_info = file.readline().strip().split(' | ')
+                        ingredient = {
+                            'ingredient_name': ingredient_info[0],
+                            'quantity': int(ingredient_info[1]),
+                            'measure': ingredient_info[2]
+                        }
+                        ingredients.append(ingredient)
+                    cook_book[dish_name] = ingredients
+                    file.readline()  # Пропускаем пустую строку между рецептами
+        except FileNotFoundError:
+            print(f"Файл {file_path} не найден.")
+        except Exception as e:
+            print(f"Ошибка при чтении файла: {e}")
         return cook_book
 
-
-    def get_shop_list_by_dishes(dishes, person_count, cook_book):
+    @staticmethod
+    def get_shop_list_by_dishes(dishes: List[str], person_count: int, cook_book: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         shop_list = {}
         for dish in dishes:
             if dish in cook_book:
@@ -43,47 +48,62 @@ class CookBook:
                         shop_list[ingredient_name]['quantity'] += quantity
                     else:
                         shop_list[ingredient_name] = {'measure': measure, 'quantity': quantity}
+            else:
+                print(f"Блюдо '{dish}' отсутствует в кулинарной книге.")
         return shop_list
 
 class OutPut:
-    def __init__(self, path):
-        self.path = path
+    @staticmethod
+    def save_book(data: Any, file_path: str) -> None:
+        try:
+            with open(file_path, 'w', encoding='utf-8') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+        except IOError as e:
+            print(f"Ошибка при записи в файл: {e}")
 
-    def __str__(self):
-        return self.path
+    @staticmethod
+    def load_book(file_path: str) -> Any:
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            print(f"Файл {file_path} не найден.")
+        except json.JSONDecodeError:
+            print(f"Файл {file_path} имеет неверный формат JSON.")
+        except Exception as e:
+            print(f"Ошибка при чтении файла: {e}")
 
-    def save_book(self, file_path):
-
-        with open(str(file_path), 'w', encoding='utf-8') as file:
-            json.dump(self, file, ensure_ascii=False, indent=4)
-
-    def load_book(file_path) -> Any:
-
-        with open(str(file_path), 'r', encoding='utf-8') as file:
-            return json.load(file)
-
-
-    def print_book(self):
-
-        print(json.dumps(self, ensure_ascii=False, indent=4))
-
+    @staticmethod
+    def print_book(data: Any) -> None:
+        print(json.dumps(data, ensure_ascii=False, indent=4))
 
 class MergeFiles:
-    def merge_files(file_names, output_file) :
+    @staticmethod
+    def merge_files(file_names: List[str], output_file: str) -> None:
         files_info = []
-        for file_name in file_names:
-            with open(file_name, 'r', encoding='utf-8') as file:
-                lines = file.readlines()
-                files_info.append({
-                    'name': file_name,
-                    'line_count': len(lines),
-                    'content': lines
-                })
-        files_info.sort(key=lambda x: x['line_count'])
-        with open(output_file, 'w', encoding='utf-8') as output:
-            for file_info in files_info:
-                output.write(f"{file_info['name']}\n{file_info['line_count']}\n")
-                output.writelines(file_info['content'])
+        try:
+            for file_name in file_names:
+                try:
+                    with open(file_name, 'r', encoding='utf-8') as file:
+                        lines = file.readlines()
+                        files_info.append({
+                            'name': file_name,
+                            'line_count': len(lines),
+                            'content': lines
+                        })
+                except FileNotFoundError:
+                    print(f"Файл {file_name} не найден.")
+                except Exception as e:
+                    print(f"Ошибка при чтении файла {file_name}: {e}")
+
+            files_info.sort(key=lambda x: x['line_count'])
+
+            with open(output_file, 'w', encoding='utf-8') as output:
+                for file_info in files_info:
+                    output.write(f"{file_info['name']}\n{file_info['line_count']}\n")
+                    output.writelines(file_info['content'])
+        except IOError as e:
+            print(f"Ошибка при записи в файл {output_file}: {e}")
 
 # Пример использования
 if __name__ == "__main__":
